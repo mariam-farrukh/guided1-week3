@@ -1,16 +1,30 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const bcrypt = require('bcryptsjs');
+const bcrypt = require('bcryptjs');
+const session = require('express-session');
 
 const db = require('./database/dbConfig.js');
 const Users = require('./users/users-model.js');
 
 const server = express();
 
+const sessionConfig = {
+  name: "chocochip", // would name the cookie sid by default
+  secret: process.env.SESSION_SECRET || 'keep it secret, keep it safe',
+  cookie:{
+    maxAge: 1000 * 60 * 60, // in milliseconds
+    secure: false, // true means only send cookie over https
+    httpOnly: true, // true means JS has no access to the cookie
+  },
+  resave: false,
+  saveUninitialized: true, // GDPR compliance
+}
+
 server.use(helmet());
 server.use(express.json());
 server.use(cors());
+server.use(session(sessionConfig));
 
 server.get('/', (req, res) => {
   res.send("It's alive!");
